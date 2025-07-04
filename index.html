@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo Quiz - Συνταγματικό Δίκαιο</title>
+<style>
+  body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+  .question { font-weight: bold; margin-top: 20px; }
+  .option { margin: 5px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; }
+  .option.correct { background-color: #c8e6c9; }
+  .option.incorrect { background-color: #ffcdd2; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<h2>Quiz Εξάσκησης - Συνταγματικό Δίκαιο (Demo)</h2>
+<div id="quiz"></div>
+<div id="score" class="hidden"></div>
+<script>
+const questions = [
+  {
+    question: "Το δικαίωμα ίδρυσης και συμμετοχής σε πολιτικό κόμμα:",
+    options: ["Είναι κοινωνικό δικαίωμα", "Είναι πολιτικό δικαίωμα", "Είναι ατομικό δικαίωμα", "Είναι ατομικό και πολιτικό δικαίωμα συγχρόνως"],
+    correct: 3
+  },
+  {
+    question: "Η Ευρωπαϊκή Σύμβαση των Δικαιωμάτων του Ανθρώπου είναι:",
+    options: ["Κατώτερη από τον τυπικό νόμο", "Ουσιαστικός νόμος", "Μέρος του ουσιαστικού Συντάγματος", "Μη δεσμευτικό διεθνές κείμενο"],
+    correct: 2
+  },
+  {
+    question: "Η αναδρομική ισχύς των νόμων:",
+    options: ["Κατά κανόνα απαγορεύεται από το Σύνταγμα", "Κατά κανόνα δεν απαγορεύεται από το Σύνταγμα", "Είναι συνταγματικά επιβεβλημένη", "Αφορά μόνο τους ουσιαστικούς νόμους"],
+    correct: 0
+  }
+];
+
+let currentQuestion = 0;
+let correctFirstTry = 0;
+let wrongFirstTry = 0;
+let triedWrong = false;
+const quizContainer = document.getElementById('quiz');
+const scoreContainer = document.getElementById('score');
+
+function loadQuestion() {
+  triedWrong = false;
+  const q = questions[currentQuestion];
+  quizContainer.innerHTML = `<div class='question'>${q.question}</div>`;
+  q.options.forEach((option, index) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = option;
+    div.onclick = () => checkAnswer(index);
+    quizContainer.appendChild(div);
+  });
+}
+
+function checkAnswer(selected) {
+  const q = questions[currentQuestion];
+  const options = document.querySelectorAll('.option');
+  if (selected === q.correct) {
+    if (!triedWrong) { correctFirstTry++; }
+    options[selected].classList.add('correct');
+    setTimeout(() => {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        showScore();
+      }
+    }, 800);
+  } else {
+    triedWrong = true;
+    options[selected].classList.add('incorrect');
+    alert('Δοκίμασε ξανά');
+  }
+}
+
+function showScore() {
+  quizContainer.classList.add('hidden');
+  scoreContainer.classList.remove('hidden');
+  scoreContainer.innerHTML = `<h3>Ολοκλήρωση Ενότητας</h3>
+    <p>Σωστά με την πρώτη: ${correctFirstTry} από ${questions.length}</p>
+    <p>Λάθος με την πρώτη: ${questions.length - correctFirstTry} από ${questions.length}</p>`;
+}
+
+loadQuestion();
+</script>
+</body>
+</html>
