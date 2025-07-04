@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Demo Quiz - Συνταγματικό Δίκαιο</title>
+<title>Quiz Εξάσκησης ASEP</title>
 <style>
   body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
   .question { font-weight: bold; margin-top: 20px; }
@@ -11,41 +11,58 @@
   .option.correct { background-color: #c8e6c9; }
   .option.incorrect { background-color: #ffcdd2; }
   .hidden { display: none; }
+  button { padding: 10px; margin-top: 20px; }
 </style>
 </head>
 <body>
-<h2>Quiz Εξάσκησης - Συνταγματικό Δίκαιο (Demo)</h2>
-<div id="quiz"></div>
+<h2>Quiz Εξάσκησης ASEP - Επιλογή Ενότητας</h2>
+<div id="menu"></div>
+<div id="quiz" class="hidden"></div>
 <div id="score" class="hidden"></div>
 <script>
-const questions = [
-  {
-    question: "Το δικαίωμα ίδρυσης και συμμετοχής σε πολιτικό κόμμα:",
-    options: ["Είναι κοινωνικό δικαίωμα", "Είναι πολιτικό δικαίωμα", "Είναι ατομικό δικαίωμα", "Είναι ατομικό και πολιτικό δικαίωμα συγχρόνως"],
-    correct: 3
-  },
-  {
-    question: "Η Ευρωπαϊκή Σύμβαση των Δικαιωμάτων του Ανθρώπου είναι:",
-    options: ["Κατώτερη από τον τυπικό νόμο", "Ουσιαστικός νόμος", "Μέρος του ουσιαστικού Συντάγματος", "Μη δεσμευτικό διεθνές κείμενο"],
-    correct: 2
-  },
-  {
-    question: "Η αναδρομική ισχύς των νόμων:",
-    options: ["Κατά κανόνα απαγορεύεται από το Σύνταγμα", "Κατά κανόνα δεν απαγορεύεται από το Σύνταγμα", "Είναι συνταγματικά επιβεβλημένη", "Αφορά μόνο τους ουσιαστικούς νόμους"],
-    correct: 0
-  }
-];
+const quizData = {
+  'Συνταγματικό Δίκαιο': [
+    {question: "Το δικαίωμα ίδρυσης και συμμετοχής σε πολιτικό κόμμα:", options: ["Είναι κοινωνικό δικαίωμα", "Είναι πολιτικό δικαίωμα", "Είναι ατομικό δικαίωμα", "Είναι ατομικό και πολιτικό δικαίωμα συγχρόνως"], correct: 3},
+    {question: "Η Ευρωπαϊκή Σύμβαση των Δικαιωμάτων του Ανθρώπου είναι:", options: ["Κατώτερη από τον τυπικό νόμο", "Ουσιαστικός νόμος", "Μέρος του ουσιαστικού Συντάγματος", "Μη δεσμευτικό διεθνές κείμενο"], correct: 2},
+    {question: "Η αναδρομική ισχύς των νόμων:", options: ["Κατά κανόνα απαγορεύεται από το Σύνταγμα", "Κατά κανόνα δεν απαγορεύεται από το Σύνταγμα", "Είναι συνταγματικά επιβεβλημένη", "Αφορά μόνο τους ουσιαστικούς νόμους"], correct: 0}
+  ],
+  'Διοικητικό Δίκαιο': [
+    {question: "Το ΣτΕ είναι:", options: ["Πολιτικό Δικαστήριο", "Ποινικό Δικαστήριο", "Διοικητικό Δικαστήριο", "Δικαστήριο Ανθρωπίνων Δικαιωμάτων"], correct: 2},
+    {question: "Η διοικητική πράξη θεωρείται ατομική όταν:", options: ["Αφορά συγκεκριμένο πρόσωπο ή πρόσωπα", "Αφορά γενικά το κοινό", "Είναι κανονιστική", "Είναι δικαστική απόφαση"], correct: 0}
+  ]
+};
 
+let currentSet = [];
 let currentQuestion = 0;
 let correctFirstTry = 0;
-let wrongFirstTry = 0;
 let triedWrong = false;
+const menuContainer = document.getElementById('menu');
 const quizContainer = document.getElementById('quiz');
 const scoreContainer = document.getElementById('score');
 
+function showMenu() {
+  menuContainer.innerHTML = '<p>Επίλεξε ενότητα για να ξεκινήσεις:</p>';
+  Object.keys(quizData).forEach(topic => {
+    const btn = document.createElement('button');
+    btn.textContent = topic;
+    btn.onclick = () => startQuiz(topic);
+    menuContainer.appendChild(btn);
+  });
+}
+
+function startQuiz(topic) {
+  currentSet = quizData[topic];
+  currentQuestion = 0;
+  correctFirstTry = 0;
+  menuContainer.classList.add('hidden');
+  quizContainer.classList.remove('hidden');
+  scoreContainer.classList.add('hidden');
+  loadQuestion();
+}
+
 function loadQuestion() {
   triedWrong = false;
-  const q = questions[currentQuestion];
+  const q = currentSet[currentQuestion];
   quizContainer.innerHTML = `<div class='question'>${q.question}</div>`;
   q.options.forEach((option, index) => {
     const div = document.createElement('div');
@@ -57,14 +74,14 @@ function loadQuestion() {
 }
 
 function checkAnswer(selected) {
-  const q = questions[currentQuestion];
+  const q = currentSet[currentQuestion];
   const options = document.querySelectorAll('.option');
   if (selected === q.correct) {
     if (!triedWrong) { correctFirstTry++; }
     options[selected].classList.add('correct');
     setTimeout(() => {
       currentQuestion++;
-      if (currentQuestion < questions.length) {
+      if (currentQuestion < currentSet.length) {
         loadQuestion();
       } else {
         showScore();
@@ -73,7 +90,6 @@ function checkAnswer(selected) {
   } else {
     triedWrong = true;
     options[selected].classList.add('incorrect');
-    alert('Δοκίμασε ξανά');
   }
 }
 
@@ -81,11 +97,18 @@ function showScore() {
   quizContainer.classList.add('hidden');
   scoreContainer.classList.remove('hidden');
   scoreContainer.innerHTML = `<h3>Ολοκλήρωση Ενότητας</h3>
-    <p>Σωστά με την πρώτη: ${correctFirstTry} από ${questions.length}</p>
-    <p>Λάθος με την πρώτη: ${questions.length - correctFirstTry} από ${questions.length}</p>`;
+    <p>Σωστά με την πρώτη: ${correctFirstTry} από ${currentSet.length}</p>
+    <p>Λάθος με την πρώτη: ${currentSet.length - correctFirstTry} από ${currentSet.length}</p>
+    <button onclick='restart()'>Επιστροφή στο Μενού</button>`;
 }
 
-loadQuestion();
+function restart() {
+  quizContainer.classList.add('hidden');
+  scoreContainer.classList.add('hidden');
+  menuContainer.classList.remove('hidden');
+}
+
+showMenu();
 </script>
 </body>
 </html>
